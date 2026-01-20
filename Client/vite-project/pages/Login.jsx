@@ -11,8 +11,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
     try {
-      const response = await axios.post("http://localhost:3000/api/users/login", userData);
-      console.log("Login successful:", response.data);
+      const response = await axios.post("http://localhost:3000/api/users/login", userData , { withCredentials: true });
+      console.log("Login successful:", response.data.token);
     } catch (error) {
       console.error("Login failed:", error);
     }
