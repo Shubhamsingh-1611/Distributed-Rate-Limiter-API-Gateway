@@ -1,6 +1,21 @@
 import React from "react";
+import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 export default function LandingPage({ username, password }) {
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.get("http://localhost:3000/api/users/logout", { withCredentials: true });
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-black relative scroll-none overflow-hidden">
       {/* Glowing background */}
@@ -33,7 +48,7 @@ export default function LandingPage({ username, password }) {
 
         {/* Footer */}
         <div className="mt-6 text-center">
-          <button className="px-6 py-3 rounded-lg bg-black text-white font-semibold hover:bg-gray-800 transition">
+          <button onClick={handleSubmit} className="px-6 py-3 rounded-lg bg-black text-white font-semibold hover:bg-gray-800 transition">
             Logout
           </button>
         </div>
