@@ -1,21 +1,37 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { loginSchema } from "../utility/zodSchema.js";
 import axios from "axios";
 
 export default function Login() {
+
+  const navigate = useNavigate();
+
   const [userData, setUserData] = useState({
     email: "",
     password: "",
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
+    
+    const result = loginSchema.safeParse(userData); // method of zod to validate data
+
+    if (!result.success) {
+      const formattedErrors = result.error.format();
+      setErrors(formattedErrors);
+      return;
+    } else {
+     setErrors({});
     try {
       const response = await axios.post("http://localhost:3000/api/users/login", userData , { withCredentials: true });
       console.log("Login successful:", response.data.token);
     } catch (error) {
       console.error("Login failed:", error);
     }
+  }
   };
 
 
@@ -42,6 +58,7 @@ export default function Login() {
               placeholder="you@example.com"
               className="w-full px-4 py-3 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-black"
             />
+            <p style={{color:"red"}}>{errors.email?._errors?.[0]}</p>
           </div>
           <div>
             <label className="block text-black mb-2">Password</label>
@@ -52,6 +69,7 @@ export default function Login() {
               placeholder="••••••••"
               className="w-full px-4 py-3 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-black"
             />
+            <p style={{color:"red"}}>{errors.password?._errors?.[0]}</p>
           </div>
 
           <button
@@ -64,8 +82,8 @@ export default function Login() {
         </form>
 
         <div className="flex justify-between items-center mt-6 text-sm text-black">
-          <a href="#" className="hover:underline">Forgot Password?</a>
-          <a href="#" className="hover:underline">Create Account</a>
+          {/* <a href="#" className="hover:underline">Forgot Password?</a> */}
+          <a href="#" className="hover:underline" onClick={() => navigate("/register")}>Create Account</a>
         </div>
       </div>
     </div>

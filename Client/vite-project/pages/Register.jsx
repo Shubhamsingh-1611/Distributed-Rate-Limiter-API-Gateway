@@ -1,27 +1,46 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { registerSchema } from "../utility/zodSchema.js";
 import { useState } from "react";
 
 
 
 export default function Register() {
+ 
+  const navigate = useNavigate();
+
   const [userData, setUserData] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    confirmPassword: "",
   });
+  const [errors, setErrors] = useState({});
+  
 
   const handleSubmit = async (e) => {
+     
     e.preventDefault(); // Prevent default form submission behavior
-    try {
-      const response = await axios.post("http://localhost:3000/api/users/register", userData);  
-      console.log("Registration successful:", response.data);
-      // You can redirect the user or show a success message here
-    } catch (error) {
-      console.error("Registration failed:", error);
-      // Handle registration errors here
-    }
+
+    const result = registerSchema.safeParse(userData); // method of zod to validate data
+
+    if (!result.success) {   
+    const formattedErrors = result.error.format(); 
+    setErrors(formattedErrors);
+    } else {
+      setErrors({});
+      try {
+        const response = await axios.post("http://localhost:3000/api/users/register", userData);  
+        console.log("Registration successful:", response.data);
+      
+      } catch (error) {
+        console.error("Registration failed:", error);
+        
+      }
+  }
   };  
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-black relative scroll-none overflow-hidden ">
       {/* Glowing background */}
@@ -45,6 +64,7 @@ export default function Register() {
               placeholder="yourusername"
               className="w-full px-4 py-3 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-black"
             />
+            <p style={{color:"red"}}>{errors.username?._errors?.[0]}</p>
           </div>
           <div>
             <label className="block text-black mb-2">Email</label>
@@ -55,6 +75,7 @@ export default function Register() {
               placeholder="you@example.com"
               className="w-full px-4 py-3 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-black"
             />
+            <p style={{color:"red"}}>{errors.email?._errors?.[0]}</p>
           </div>
           <div>
             <label className="block text-black mb-2">Password</label>
@@ -65,6 +86,19 @@ export default function Register() {
               placeholder="••••••••"
               className="w-full px-4 py-3 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-black"
             />
+            <p style={{color:"red"}}>{errors.password?._errors?.[0]}</p>
+          </div>
+
+          <div>
+            <label className="block text-black mb-2">Confirm Password</label>
+            <input
+              type="text"
+              value={userData.confirmPassword}
+              onChange={(e) => setUserData({...userData, confirmPassword: e.target.value})}
+              placeholder="••••••••"
+              className="w-full px-4 py-3 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-black"
+            />
+            <p style={{color:"red"}}>{errors.confirmPassword?._errors?.[0]}</p>
           </div>
 
           <button
@@ -77,8 +111,8 @@ export default function Register() {
         </form>
 
         <div className="flex justify-between items-center mt-6 text-sm text-black">
-          <a href="#" className="hover:underline">Already have an account?</a>
-          <a href="#" className="hover:underline">Login</a>
+          <a href="#" className="hover:underline" onClick={() => navigate("/login")}>Already have an account?</a>
+          {/* <a href="#" className="hover:underline">Login</a> */}
         </div>
       </div>
     </div>
