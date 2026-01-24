@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { loginSchema } from "../utility/zodSchema.js";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function Login() {
 
@@ -28,8 +29,11 @@ export default function Login() {
     try {
       const response = await axios.post("http://localhost:3000/api/users/login", userData , { withCredentials: true });
       console.log("Login successful:", response.data.token);
+      toast.success("Login successful!");
+      navigate("/user");
     } catch (error) {
       console.error("Login failed:", error);
+      toast.error("Login failed: " + error.response.data.message);
     }
   }
   };

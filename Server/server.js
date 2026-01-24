@@ -5,9 +5,12 @@ import cookieParser from 'cookie-parser';
 import connectDB from './Database/Connect.js';
 import userRoutes from './Routes/userRoutes.js';
 
+
 dotenv.config();
 
 const app = express();
+
+
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:5173', // frontend URL

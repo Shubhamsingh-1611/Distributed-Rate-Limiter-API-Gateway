@@ -3,10 +3,16 @@ import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+
 const registerUser = (req, res) => {
   // Registration logic here
   const { username, email, password } = req.body;
-  User.findOne({ email }).then(user => {
+  User.findOne({
+    $or: [
+      { email},
+      { username }
+    ]
+  }).then(user => {
     if (user) {
       console.log('User already exists with this email.');  
       res.status(400).json({ message: 'User already exists with this email' });
@@ -63,4 +69,23 @@ const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };  
 
-export { registerUser, loginUser, logoutUser };
+const userDeatils = async (req, res) => {
+  try {
+    const user = req.user;
+    console.log("User from token:", req.user);
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized. No user logged in." });
+    }
+
+    const foundUser = await User.findById(user.id).select('-password'); // Exclude password
+    if (!foundUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    res.status(200).json(foundUser);
+  } catch (err) {
+    console.error(err);
+    res.status(403).json({ message: "Invalid or expired token." });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, userDeatils };

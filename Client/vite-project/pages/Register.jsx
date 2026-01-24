@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { registerSchema } from "../utility/zodSchema.js";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 
 
@@ -32,9 +33,12 @@ export default function Register() {
       try {
         const response = await axios.post("http://localhost:3000/api/users/register", userData);  
         console.log("Registration successful:", response.data);
+        toast.success("Registration successful! Please login.");
+        navigate("/login");
       
       } catch (error) {
         console.error("Registration failed:", error);
+        toast.error("Registration failed"+ error.response.data.message);
         
       }
   }
